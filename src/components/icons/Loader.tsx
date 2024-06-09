@@ -1,9 +1,21 @@
-const Loader = ({ heightWidth = "w-20 h-20" }: { heightWidth?: string }) => {
+const Loader = ({
+  loaderSize = "big",
+  info,
+}: {
+  loaderSize?: "small" | "big";
+  info?: string;
+}) => {
   return (
-    <div className={`flex justify-center items-center h-screen`}>
+    <div
+      className={`flex flex-col justify-center items-center gap-2 ${
+        loaderSize == "small" ? "h-full" : "h-screen"
+      }`}
+    >
       <svg
         aria-hidden="true"
-        className={`inline ${heightWidth} text-gray-200 animate-spin dark:text-gray-600 fill-blue-600`}
+        className={`inline ${
+          loaderSize == "small" ? "h-6 w-6" : "h-20 w-20"
+        } text-gray-200 animate-spin dark:text-gray-600 fill-blue-600`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -17,6 +29,7 @@ const Loader = ({ heightWidth = "w-20 h-20" }: { heightWidth?: string }) => {
           fill="currentFill"
         />
       </svg>
+      <div className=" font-bold text-xl text-stone-900">{info}</div>
     </div>
   );
 };

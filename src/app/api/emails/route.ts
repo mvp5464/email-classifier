@@ -1,14 +1,11 @@
-// import type { NextApiRequest, NextApiResponse } from "next";
 import { authOptions, session } from "@/lib/auth";
 import { google } from "googleapis";
 import { getServerSession } from "next-auth";
-// import { getSession } from "next-auth/react";
 import { NextResponse } from "next/server";
+import { JSDOM } from "jsdom";
 
 export async function GET() {
-  //@ts-ignore
-  const session: session = await getServerSession(authOptions);
-  // console.log({ session });
+  const session: session = (await getServerSession(authOptions)) as session;
 
   if (!session) {
     return NextResponse.json(
@@ -16,38 +13,50 @@ export async function GET() {
       { status: 401 }
     );
   }
-  // console.log({ session: session.user });
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token: session.accessToken as string });
-  // console.log({ auth });
   const gmail = google.gmail({ version: "v1", auth });
-  // console.log({ gmail });
-  console.log("-------------");
+  try {
+    const response = await gmail.users.messages.list({
+      userId: "me",
+    });
 
-  const response = await gmail.users.messages.list({
-    userId: "me",
-    maxResults: 10,
-  });
-  // console.log({ response });
-  // console.log("-------------");
+    const emails = await Promise.all(
+      (response.data.messages || []).map(async (msg: any) => {
+        const email = await gmail.users.messages.get({
+          userId: "me",
+          id: msg.id,
+          format: "full",
+        });
+        return {
+          id: email.data.id,
+          subject: email.data.payload?.headers?.find(
+            (f) => f.name === "Subject"
+          )?.value,
+          from: email.data.payload?.headers?.find((f) => f.name === "From")
+            ?.value,
+          snippet: email.data.snippet,
+          body:
+            email.data.payload?.parts?.[0].body?.data ||
+            email.data.payload?.body?.data ||
+            "null",
+        };
+      })
+    );
+    const value = emails.map((email) => {
+      const data = email.body;
+      const info = Buffer.from(data, "base64").toString("utf-8");
+      const dom = new JSDOM(info);
+      email.body = dom.window.document.body.textContent as string;
 
-  const emails = await Promise.all(
-    //change this any
-    (response.data.messages || []).map(async (msg: any) => {
-      const email = await gmail.users.messages.get({
-        userId: "me",
-        id: msg.id,
-        // format: "raw",
-        format: "full",
-      });
-      return email.data;
-      // return {
-      //   author: email.data.payload?.headers?.find((f) => f.name === "From")
-      //     ?.value,
-      //   emails: email.data.snippet,
-      // };
-    })
-  );
+      return email;
+    });
 
-  return NextResponse.json(emails, { status: 200 });
+    return NextResponse.json(value, { status: 200 });
+  } catch (e) {
+    return NextResponse.json(
+      { message: "Error while Fetching Emails" },
+      { status: 503 }
+    );
+  }
 }

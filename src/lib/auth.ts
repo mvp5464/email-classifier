@@ -14,7 +14,6 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       authorization: {
         params: {
-          // scope: "https://www.googleapis.com/auth/gmail.readonly",
           scope:
             "openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/gmail.readonly",
         },
@@ -36,9 +35,6 @@ export const authOptions: NextAuthOptions = {
         mySession.accessToken = token.accessToken as string;
         mySession.idToken = token.idToken as string;
       }
-      console.log("+++++++");
-      // console.log({ mySession });
-      // console.log({ token });
       return mySession!;
     },
   },

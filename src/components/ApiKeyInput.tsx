@@ -1,12 +1,12 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-export default function OpenAIKeyInput() {
+export default function ApiKeyInput() {
   const [apiKey, setApiKey] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
-    const storedKey = localStorage.getItem("openaiKey");
+    const storedKey = localStorage.getItem("gemini-api-key");
     if (storedKey) {
       setApiKey(storedKey);
     }
@@ -19,19 +19,19 @@ export default function OpenAIKeyInput() {
 
   return (
     <div className=" flex flex-col justify-center items-center gap-4">
-      <p className=" font-bold text-xl">Enter Your OpenAI API Key</p>
+      <p className=" font-bold text-xl">Enter Your Gemini API Key</p>
       <div>
         <input
           type="text"
           value={apiKey}
           onChange={handleApiKeyChange}
-          placeholder="OpenAI API Key"
+          placeholder="Gemini API Key"
           className="px-4 py-2 border rounded"
         />
         <button
-          className="px-4 py-2 bg-green-500 text-white rounded ml-4"
+          className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded ml-4"
           onClick={() => {
-            localStorage.setItem("openaiKey", apiKey);
+            localStorage.setItem("gemini-api-key", apiKey);
             router.push("/emails");
           }}
         >

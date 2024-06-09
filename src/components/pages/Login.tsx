@@ -1,8 +1,8 @@
 "use client";
 import { signIn, useSession } from "next-auth/react";
-import OpenAIKeyInput from "./OpenAIKeyInput";
+import ApiKeyInput from "../ApiKeyInput";
 import { useState } from "react";
-import Loader from "./Loader";
+import Loader from "../icons/Loader";
 export default function Login() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
@@ -10,7 +10,7 @@ export default function Login() {
   if (status === "loading") {
     return (
       <>
-        <Loader />
+        <Loader info={"Getting Session Info"} />
       </>
     );
   }
@@ -28,7 +28,7 @@ export default function Login() {
           {loading ? "Loading..." : "Login with Google"}
         </button>
       ) : (
-        <OpenAIKeyInput />
+        <ApiKeyInput />
       )}
     </div>
   );
