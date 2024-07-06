@@ -48,7 +48,7 @@ export default function GetEmails() {
       toast.success("Email Fetched successfully");
     } catch (e) {
       setLoading(false);
-      toast.success("Error while fetching emails");
+      toast.error("Error while fetching emails");
       console.log({ e });
     }
   };
